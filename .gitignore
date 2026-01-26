@@ -1,19 +1,6 @@
-# ENV files (never commit)
+# Environment files
 .env
-.env.*
-backend/.env
-frontend/.env
-
-# Dependencies
-node_modules/
-
-# Builds
-dist/
-build/
-.next/
-.out/
-
-# OS / editor
-.DS_Store
-.vscode/
-.idea/
+.env.local
+.env.development
+.env.production
+.env.test

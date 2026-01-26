@@ -1,11 +1,6 @@
-# env
+# Environment files
 .env
-
-# deps
-node_modules/
-
-# builds
-dist/
-
-# logs
-*.log
+.env.local
+.env.development
+.env.production
+.env.test
