@@ -1,0 +1,19 @@
+# ENV files (never commit)
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+build/
+.next/
+.out/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
