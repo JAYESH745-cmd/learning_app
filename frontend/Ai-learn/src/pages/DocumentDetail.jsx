@@ -5,6 +5,7 @@ import Spinner from "../components/common/Spinner";
 import toast from "react-hot-toast";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import ChatInterface from "../components/chat/ChatInterface";
+import AIActions from "../components/ai/aiActions";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -86,8 +87,8 @@ const DocumentDetailPage = () => {
   );
 
   const renderAIActions = () => (
-    <div className="text-slate-500 text-sm">
-      AI actions coming soon 🤖
+    <div>
+      <AIActions/>
     </div>
   );
 

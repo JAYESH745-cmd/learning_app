@@ -1,18 +1,34 @@
 import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 
 dotenv.config();
 
-if (!process.env.GEMINI_API_KEY) {
+if (!process.env.OPENAI_API_KEY) {
   console.error(
-    "FATAL ERROR: GEMINI_API_KEY is not set in the environment variables."
+    "FATAL ERROR: OPENAI_API_KEY is not set in environment variables."
   );
   process.exit(1);
 }
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
 });
+
+/* ------------------------------------------------------------
+ * Helper: OpenAI call
+ * ------------------------------------------------------------ */
+const callOpenAI = async (prompt) => {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini", // fast + cheap + strong
+    messages: [
+      { role: "system", content: "You are a helpful educational AI assistant." },
+      { role: "user", content: prompt },
+    ],
+    temperature: 0.4,
+  });
+
+  return response.choices[0].message.content;
+};
 
 /* ------------------------------------------------------------
  * Generate Flashcards
@@ -33,15 +49,10 @@ ${text.substring(0, 15000)}
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-
-    const generatedText = response.text;
+    const generatedText = await callOpenAI(prompt);
     const flashcards = [];
 
-    const cards = generatedText.split("---").filter((c) => c.trim());
+    const cards = generatedText.split("---").filter(Boolean);
 
     for (const card of cards) {
       const lines = card.trim().split("\n");
@@ -50,15 +61,11 @@ ${text.substring(0, 15000)}
         difficulty = "medium";
 
       for (const line of lines) {
-        if (line.startsWith("Q:")) {
-          question = line.substring(2).trim();
-        } else if (line.startsWith("A:")) {
-          answer = line.substring(2).trim();
-        } else if (line.startsWith("D:")) {
-          const diff = line.substring(2).trim().toLowerCase();
-          if (["easy", "medium", "hard"].includes(diff)) {
-            difficulty = diff;
-          }
+        if (line.startsWith("Q:")) question = line.slice(2).trim();
+        if (line.startsWith("A:")) answer = line.slice(2).trim();
+        if (line.startsWith("D:")) {
+          const diff = line.slice(2).trim().toLowerCase();
+          if (["easy", "medium", "hard"].includes(diff)) difficulty = diff;
         }
       }
 
@@ -69,7 +76,7 @@ ${text.substring(0, 15000)}
 
     return flashcards.slice(0, count);
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("OpenAI error:", error);
     throw new Error("Failed to generate flashcards");
   }
 };
@@ -98,15 +105,10 @@ ${text.substring(0, 15000)}
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-
-    const generatedText = response.text;
+    const generatedText = await callOpenAI(prompt);
     const questions = [];
 
-    const blocks = generatedText.split("---").filter((b) => b.trim());
+    const blocks = generatedText.split("---").filter(Boolean);
 
     for (const block of blocks) {
       const lines = block.trim().split("\n");
@@ -117,21 +119,14 @@ ${text.substring(0, 15000)}
         difficulty = "medium";
 
       for (const line of lines) {
-        const trimmed = line.trim();
-
-        if (trimmed.startsWith("Q:")) {
-          question = trimmed.substring(2).trim();
-        } else if (trimmed.match(/^0\d:/)) {
-          options.push(trimmed.substring(3).trim());
-        } else if (trimmed.startsWith("C:")) {
-          correctAnswer = trimmed.substring(2).trim();
-        } else if (trimmed.startsWith("E:")) {
-          explanation = trimmed.substring(2).trim();
-        } else if (trimmed.startsWith("D:")) {
-          const diff = trimmed.substring(2).trim().toLowerCase();
-          if (["easy", "medium", "hard"].includes(diff)) {
-            difficulty = diff;
-          }
+        const t = line.trim();
+        if (t.startsWith("Q:")) question = t.slice(2).trim();
+        else if (t.match(/^0\d:/)) options.push(t.slice(3).trim());
+        else if (t.startsWith("C:")) correctAnswer = t.slice(2).trim();
+        else if (t.startsWith("E:")) explanation = t.slice(2).trim();
+        else if (t.startsWith("D:")) {
+          const diff = t.slice(2).trim().toLowerCase();
+          if (["easy", "medium", "hard"].includes(diff)) difficulty = diff;
         }
       }
 
@@ -148,7 +143,7 @@ ${text.substring(0, 15000)}
 
     return questions.slice(0, numQuestions);
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("OpenAI error:", error);
     throw new Error("Failed to generate quiz");
   }
 };
@@ -166,14 +161,9 @@ ${text.substring(0, 20000)}
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-
-    return response.text;
+    return await callOpenAI(prompt);
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("OpenAI error:", error);
     throw new Error("Failed to generate summary");
   }
 };
@@ -191,9 +181,8 @@ You are an intelligent assistant answering questions based on a document.
 
 Instructions:
 - Use the provided context as the primary source.
-- You MAY infer, summarize, or explain ideas that are clearly implied by the context.
-- If the answer is only partially present, explain using the available information.
-- ONLY say "The document does not contain this information" if the context is completely unrelated.
+- You MAY infer or explain ideas implied by the context.
+- If unrelated, say: "The document does not contain this information."
 
 Context:
 ${context}
@@ -201,24 +190,16 @@ ${context}
 User Question:
 ${question}
 
-Answer in a clear, helpful, and concise manner:
+Answer clearly:
 `;
 
-
-
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-
-    return response.text;
+    return await callOpenAI(prompt);
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("OpenAI error:", error);
     throw new Error("Failed to process chat request");
   }
 };
-
 
 /* ------------------------------------------------------------
  * Explain Concept
@@ -226,22 +207,16 @@ Answer in a clear, helpful, and concise manner:
 export const explainConcept = async (concept, context) => {
   const prompt = `
 Explain the concept of "${concept}" based on the following context.
-Provide a clear, educational explanation that is easy to understand.
-Include examples if relevant.
+Provide a clear, educational explanation with examples if helpful.
 
 Context:
 ${context.substring(0, 10000)}
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-
-    return response.text;
+    return await callOpenAI(prompt);
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("OpenAI error:", error);
     throw new Error("Failed to explain concept");
   }
 };
