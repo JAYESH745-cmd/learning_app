@@ -1,74 +1,198 @@
 /**
- * Normalize and split text into overlapping word-based chunks
- *
- * @param {string} text
- * @param {number} chunkSize
- * @param {number} overlap
- * @returns {Array<{ chunkIndex: number, content: string }>}
+ * Split text into chunks for better AI processing
+ * @param {string} text - Full text to chunk
+ * @param {number} chunkSize - Target size per chunk (in words)
+ * @param {number} overlap - Number of words to overlap between chunks
+ * @returns {Array<{content: string, chunkIndex: number, pageNumber: number}>}
  */
-export const chunkText = (text, chunkSize = 180, overlap = 40) => {
-  if (!text || typeof text !== "string") return [];
+export const chunkText = (text, chunkSize = 500, overlap = 50) => {
+  if (!text || text.trim().length === 0) {
+    return [];
+  }
 
-  const cleanText = text
-    .replace(/-\n/g, "")
-    .replace(/\n+/g, " ")
-    .replace(/\s+/g, " ")
+  // Clean text while preserving paragraph structure
+  const cleanedText = text
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+/g, ' ')
+    .replace(/\n\s+/g, '\n')
+    .replace(/\s\n/g, '\n')
     .trim();
 
-  const words = cleanText.split(" ");
+  // Split by paragraphs
+  const paragraphs = cleanedText
+    .split(/\n+/)
+    .filter(p => p.trim().length > 0);
+
   const chunks = [];
+  let currentChunk = [];
+  let currentWordCount = 0;
+  let chunkIndex = 0;
 
-  let start = 0;
-  let index = 0;
+  for (const paragraph of paragraphs) {
+    const paragraphWords = paragraph.trim().split(/\s+/);
+    const paragraphWordCount = paragraphWords.length;
 
-  while (start < words.length) {
-    const end = start + chunkSize;
-    const chunkWords = words.slice(start, end);
+    // If a single paragraph is too large, split by words
+    if (paragraphWordCount > chunkSize) {
+      if (currentChunk.length > 0) {
+        chunks.push({
+          content: currentChunk.join('\n\n'),
+          chunkIndex: chunkIndex++,
+          pageNumber: 0
+        });
+        currentChunk = [];
+        currentWordCount = 0;
+      }
 
+      for (let i = 0; i < paragraphWords.length; i += (chunkSize - overlap)) {
+        const chunkWords = paragraphWords.slice(i, i + chunkSize);
+        chunks.push({
+          content: chunkWords.join(' '),
+          chunkIndex: chunkIndex++,
+          pageNumber: 0
+        });
+
+        if (i + chunkSize >= paragraphWords.length) break;
+      }
+
+      continue;
+    }
+
+    // If adding this paragraph exceeds chunk size, save current chunk
+    if (
+      currentWordCount + paragraphWordCount > chunkSize &&
+      currentChunk.length > 0
+    ) {
+      chunks.push({
+        content: currentChunk.join('\n\n'),
+        chunkIndex: chunkIndex++,
+        pageNumber: 0
+      });
+
+      // Create overlap
+      const prevChunkText = currentChunk.join(' ');
+      const prevWords = prevChunkText.split(/\s+/);
+      const overlapWords = prevWords.slice(-overlap);
+
+      currentChunk = overlapWords.length ? [overlapWords.join(' ')] : [];
+      currentWordCount = overlapWords.length;
+    }
+
+    currentChunk.push(paragraph);
+    currentWordCount += paragraphWordCount;
+  }
+
+  // Add last chunk
+  if (currentChunk.length > 0) {
     chunks.push({
-      chunkIndex: index,
-      content: chunkWords.join(" "),
+      content: currentChunk.join('\n\n'),
+      chunkIndex,
+      pageNumber: 0
     });
+  }
 
-    index++;
-    start += chunkSize - overlap;
+  // Fallback: split purely by words
+  if (chunks.length === 0 && cleanedText.length > 0) {
+    const allWords = cleanedText.split(/\s+/);
+    let fallbackIndex = 0;
+
+    for (let i = 0; i < allWords.length; i += (chunkSize - overlap)) {
+      const chunkWords = allWords.slice(i, i + chunkSize);
+      chunks.push({
+        content: chunkWords.join(' '),
+        chunkIndex: fallbackIndex++,
+        pageNumber: 0
+      });
+
+      if (i + chunkSize >= allWords.length) break;
+    }
   }
 
   return chunks;
 };
 
 /**
- * Find most relevant chunks using improved keyword scoring
- *
- * @param {Array<{ chunkIndex: number, content: string }>} chunks
+ * Find relevant chunks based on keyword matching
+ * @param {Array<Object>} chunks
  * @param {string} query
  * @param {number} maxChunks
- * @returns {Array<{ chunkIndex: number, content: string, score: number }>}
+ * @returns {Array<Object>}
  */
 export const findRelevantChunks = (chunks, query, maxChunks = 3) => {
-  if (!Array.isArray(chunks) || !query) return [];
+  if (!chunks || chunks.length === 0 || !query) {
+    return [];
+  }
 
-  const queryTerms = query
+  // Common stop words
+  const stopWords = new Set([
+    'the', 'is', 'at', 'which', 'on', 'a', 'an', 'and', 'or', 'but',
+    'in', 'with', 'to', 'for', 'of', 'as', 'by', 'this', 'that', 'it'
+  ]);
+
+  const queryWords = query
     .toLowerCase()
     .split(/\s+/)
-    .filter(t => t.length > 2);
+    .filter(w => w.length > 2 && !stopWords.has(w));
 
-  const scored = chunks.map(chunk => {
-    const text = chunk.content.toLowerCase();
+  if (queryWords.length === 0) {
+    return chunks.slice(0, maxChunks).map(chunk => ({
+      content: chunk.content,
+      chunkIndex: chunk.chunkIndex,
+      pageNumber: chunk.pageNumber,
+      _id: chunk._id
+    }));
+  }
+
+  const scoredChunks = chunks.map((chunk, index) => {
+    const content = chunk.content.toLowerCase();
+    const contentWordCount = content.split(/\s+/).length;
     let score = 0;
 
-    for (const term of queryTerms) {
-      if (text.includes(term)) score += 4;
+    for (const word of queryWords) {
+      // Exact matches
+      const exactMatches =
+        (content.match(new RegExp(`\\b${word}\\b`, 'g')) || []).length;
+      score += exactMatches * 3;
+
+      // Partial matches
+      const partialMatches =
+        (content.match(new RegExp(word, 'g')) || []).length;
+      score += Math.max(0, partialMatches - exactMatches) * 1.5;
     }
 
-    // bonus for longer, meaningful chunks
-    score += Math.min(text.length / 300, 5);
+    // Bonus for multiple query words
+    const uniqueWordsFound = queryWords.filter(word =>
+      content.includes(word)
+    ).length;
 
-    return { ...chunk, score };
+    if (uniqueWordsFound > 1) {
+      score += uniqueWordsFound * 2;
+    }
+
+    // Normalize by content length
+    const normalizedScore = score / Math.sqrt(contentWordCount || 1);
+
+    // Earlier chunks slight bonus
+    const positionBonus = 1 - (index / chunks.length) * 0.1;
+
+    return {
+      content: chunk.content,
+      chunkIndex: chunk.chunkIndex,
+      pageNumber: chunk.pageNumber,
+      _id: chunk._id,
+      score: normalizedScore * positionBonus,
+      rawScore: score,
+      matchedWords: uniqueWordsFound
+    };
   });
 
-  return scored
-    .filter(c => c.score > 0)
-    .sort((a, b) => b.score - a.score)
+  return scoredChunks
+    .filter(chunk => chunk.score > 0)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      if (b.matchedWords !== a.matchedWords)
+        return b.matchedWords - a.matchedWords;
+      return a.chunkIndex - b.chunkIndex;
+    })
     .slice(0, maxChunks);
 };

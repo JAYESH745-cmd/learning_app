@@ -142,7 +142,7 @@ const DocumentListPage = () => {
                 key={doc._id}
                 className="bg-white rounded-xl cursor-pointer transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-lg border border-slate-200 p-5 shadow-sm hover:shadow-md transition"
                 onClick={()=>{
-                  navigate(`/document/${doc._id}`)
+                  navigate(`/documents/${doc._id}`)
                 }}
               >
                 <div className="flex items-start justify-between">
