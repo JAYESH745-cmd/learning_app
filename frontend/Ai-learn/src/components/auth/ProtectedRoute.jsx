@@ -1,22 +1,25 @@
-import React from 'react'
-import { Outlet,Navigate } from 'react-router-dom'
-import AppLayout from '../layouts/AppLayout';
+import React from 'react';
+import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import AppLayout from '../layouts/AppLayout';
+import Spinner from '../common/Spinner';
 
 const ProtectedRoute = () => {
-    const {isAuthenticated,loading}=useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
-    if(loading){
-        return <div>
-            Loading....
-        </div>
-    };
-  return  isAuthenticated?(
+  if (loading) {
+    return <Spinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
     <AppLayout>
-        <Outlet/>
-    </AppLayout>):(
-        <Navigate to="login" replace/>
-    );
-}
+      <Outlet />
+    </AppLayout>
+  );
+};
 
-export default ProtectedRoute
+export default ProtectedRoute;
