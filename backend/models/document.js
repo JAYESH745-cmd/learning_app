@@ -48,6 +48,7 @@ const documentSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        embedding: [Number],
       },
     ],
 
@@ -72,6 +73,6 @@ const documentSchema = new mongoose.Schema(
   }
 );
 documentSchema.index({userId:1,uploadDate:-1});
-const Document = mongoose.model("Document", documentSchema);
+const Document = mongoose.models.Document || mongoose.model("Document", documentSchema)
 
 export default Document;
