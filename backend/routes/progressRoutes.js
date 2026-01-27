@@ -8,6 +8,6 @@ const router = express.Router();
 
 router.use(protect);
 
-router.get('/dashboard', getDashboard);
+router.get('/', getDashboard);
 
 export default router;

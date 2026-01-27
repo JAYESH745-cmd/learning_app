@@ -11,11 +11,11 @@ import DocumentList from "./pages/DocumentList"
 import FlashcardList from "./pages/FlashcardList"
 import FlashcardPage from "./pages/FlashcardPage"
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { useAuth } from "./context/AuthContext";
 
 
 function App() {
-  const isAuthenticated=false;
-  const loading=false; 
+   const {isAuthenticated,loading}=useAuth();
 
   if (loading){
     return (
