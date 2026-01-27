@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import ChatInterface from "../components/chat/ChatInterface";
 import AIActions from "../components/ai/aiActions";
+import FlashcardManager from "../components/flashcards/FlashcardManager";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -93,8 +94,8 @@ const DocumentDetailPage = () => {
   );
 
   const renderFlashcardsTab = () => (
-    <div className="text-slate-500 text-sm">
-      Flashcards will appear here 📚
+    <div>
+      <FlashcardManager documentId={id}/>
     </div>
   );
 
