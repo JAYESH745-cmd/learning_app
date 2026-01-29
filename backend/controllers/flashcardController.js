@@ -66,38 +66,51 @@ export const reviewFlashcard=async (req,res,next)=>{
         next(error);
     }
 }
-export const toggleStarFlashcard=async (req,res,next)=>{
-    try {
-    const flashcardSet=await Flashcard.findOne({
-        'cards._id':req.params.cardId,
-        userId:req.user._id
-    })
-    if(!flashcardSet){
-        return res.status(404),json({
-            success:false,
-            error:'Flashcard set or card not found',
-        })
-    }
-    const cardIndex=flashcardSet.cards.findIndex(card=> card._id.toString()=== req.params.cardId);
-    if(cardIndex===-1){
-        return res.status(404),json({
-            success:false,
-            error:'Flashcard not found in set',
-        })
+export const toggleStarFlashcard = async (req, res, next) => {
+  try {
+    const flashcardSet = await Flashcard.findOne({
+      "cards._id": req.params.cardId,
+      userId: req.user._id,
+    });
+   
+
+    if (!flashcardSet) {
+      return res.status(404).json({
+        success: false,
+        error: "Flashcard set or card not found",
+      });
     }
 
-    flashcardSet.cards[cardIndex].isStarred=!flashcardSet.cards[cardIndex].isStarred;
-    await flashcard.save();
+    const cardIndex = flashcardSet.cards.findIndex(
+      (card) => card._id.toString() === req.params.cardId
+    );
+
+    if (cardIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        error: "Flashcard not found in set",
+      });
+    }
+
+    // ✅ TOGGLE (use SAME FIELD as frontend)
+    flashcardSet.cards[cardIndex].starred =
+      !flashcardSet.cards[cardIndex].starred;
+
+    // ✅ SAVE THE DOCUMENT (NOT THE MODEL)
+    await flashcardSet.save();
 
     res.status(200).json({
-        success:true,
-        data:flashcardSet,
-        message:`flashcard ${flashcardSet.cards[cardIndex].isStarred?'starred':'unstarred'}`
-    })
-    } catch (error) {
-        next(error);
-    }
-}
+      success: true,
+      data: flashcardSet.cards[cardIndex],
+      message: `Flashcard ${
+        flashcardSet.cards[cardIndex].starred ? "starred" : "unstarred"
+      }`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const deleteFlashcardset=async (req,res,next)=>{
     try {
      const flashcardSet=await Flashcard.findOne({

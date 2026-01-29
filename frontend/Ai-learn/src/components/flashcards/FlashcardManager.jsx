@@ -148,9 +148,10 @@ useEffect(() => {
         </button>
 
         <Flashcard
-          flashcard={card}
-          onToggleStar={() => {}}
-        />
+    flashcard={card}
+    onToggleStar={handleToggleStar}
+  />
+
 
         <div className="flex items-center justify-between">
           <button
@@ -242,6 +243,30 @@ useEffect(() => {
       </div>
     );
   };
+
+const handleToggleStar = async (cardId) => {
+  try {
+    // Call backend
+    await flashcardService.toggleStar(cardId);
+
+    // Update local state immediately (optimistic UI)
+    setSelectedSet((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        cards: prev.cards.map((card) =>
+          card._id === cardId
+            ? { ...card, starred: !card.starred }
+            : card
+        ),
+      };
+    });
+  } catch (error) {
+    toast.error("Failed to update star");
+  }
+};
+
 
   return (
     <>

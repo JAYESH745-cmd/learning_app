@@ -1,2 +1,23 @@
 /* src/index.css */
 @import "tailwindcss";
+
+/* Enable 3D perspective */
+.perspective {
+  perspective: 1000px;
+}
+
+/* Preserve 3D transforms */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Hide back face */
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Rotate helpers */
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
