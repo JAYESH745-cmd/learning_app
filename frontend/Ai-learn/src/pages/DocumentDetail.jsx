@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import ChatInterface from "../components/chat/ChatInterface";
 import AIActions from "../components/ai/aiActions";
 import FlashcardManager from "../components/flashcards/FlashcardManager";
+import QuizManager from "../components/quizzes/QuizManager";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();
@@ -100,8 +101,8 @@ const DocumentDetailPage = () => {
   );
 
   const renderQuizzesTab = () => (
-    <div className="text-slate-500 text-sm">
-      Quizzes will appear here 📝
+    <div >
+      <QuizManager documentId={id} />
     </div>
   );
 

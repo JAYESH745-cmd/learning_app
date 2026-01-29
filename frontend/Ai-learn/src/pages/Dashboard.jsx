@@ -9,11 +9,13 @@ import {
   Clock
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 
 const DashboardPage = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const navigate=useNavigate();
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -46,6 +48,7 @@ const DashboardPage = () => {
 
   const documents = recentActivity?.documents ?? [];
   const quizzes = recentActivity?.quizzes ?? [];
+
 
   return (
     <div className="p-6 space-y-8">
@@ -95,10 +98,12 @@ const DashboardPage = () => {
             <ActivityItem
               key={doc._id}
               title={`Accessed Document: ${doc.title || doc.fileName}`}
-              date={doc.updatedAt || doc.createdAt}
+              date={doc.lastAccessed || doc.createdAt}
+              onClick={()=>{navigate(`/documents/${doc._id}`)} }
+              className="cursor-pointer"
             />
+           
           ))}
-
           {quizzes.map((quiz) => (
             <ActivityItem
               key={quiz._id}
@@ -127,9 +132,10 @@ const StatCard = ({ title, value, icon }) => (
   </div>
 );
 
-const ActivityItem = ({ title, date, rightText }) => (
-  <div className="flex justify-between items-center bg-slate-50 rounded-lg px-4 py-3">
+const ActivityItem = ({ title, date, rightText,onClick }) => (
+  <div  onClick={onClick} className="flex cursor-pointer justify-between items-center bg-slate-50 rounded-lg px-4 py-3">
     <div>
+      
       <p className="text-sm font-medium text-slate-800">{title}</p>
       <p className="text-xs text-slate-400">
         {date ? new Date(date).toLocaleString() : "Invalid date"}
