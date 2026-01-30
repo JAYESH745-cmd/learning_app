@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
@@ -20,7 +20,7 @@ const Profile = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateProfile(form);
+      await updateUser(form);
       toast.success("Profile updated");
       setIsEditing(false);
     } catch {
