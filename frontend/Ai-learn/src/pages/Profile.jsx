@@ -8,7 +8,7 @@ const Profile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
-    name: user?.name || "",
+    name: user?.username || "",
     email: user?.email || "",
   });
   const [saving, setSaving] = useState(false);
