@@ -2,12 +2,13 @@ import Flashcard from "../models/flashcard.js";
 
 export const getAllFlashcardSets=async (req,res,next)=>{
     try {
+    console.log("USER:", req.user);
     const flashcardSets=await Flashcard.find({userId:req.user._id})
     .populate('documentId','title fileName')
         .sort({createdAt:-1});
         res.status(200).json({
             success:true,
-            count:FlashcardSets.length,
+            count:flashcardSets.length,
             data:flashcardSets
         })
     } catch (error) {
