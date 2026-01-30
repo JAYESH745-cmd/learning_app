@@ -1,4 +1,4 @@
-export const BASE_URL = "https://learning-app-umber.vercel.app/";
+export const BASE_URL = "https://learning-app-umber.vercel.app/e";
 
 export const API_PATHS = {
   AUTH: {
