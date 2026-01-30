@@ -25,6 +25,7 @@ const FlashcardPage = () => {
       try {
         // backend returns ALL sets → find by id
         const res = await flashcardService.getAllFlashcardSets();
+        console.log(res.data);
         const found = res.data.find((s) => s.documentId === setId);
         if (!found) {
           toast.error("Flashcard set not found");
