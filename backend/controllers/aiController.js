@@ -1,7 +1,7 @@
 import Document from "../models/document.js";
 import Flashcard from "../models/flashcard.js";
 import Quiz from "../models/quiz.js";
-import ChatHistory from "../models/ChatHistory.js";
+import ChatHistory from "../models/chatHistory.js"
 import * as geminiService from "../utils/geminiService.js";
 import { findRelevantChunks } from "../utils/textchunker.js";
 
