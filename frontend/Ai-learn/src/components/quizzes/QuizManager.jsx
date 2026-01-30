@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import moment from "moment";
-
+import { useNavigate } from "react-router-dom";
 import Spinner from "../common/Spinner";
 import Modal from "../common/Modal";
 import quizService from "../../services/quizservice";
@@ -17,6 +17,7 @@ const QuizManager = ({ documentId }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const navigate = useNavigate();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [quizToDelete, setQuizToDelete] = useState(null);
@@ -81,7 +82,7 @@ const QuizManager = ({ documentId }) => {
   /* ---------------- Start Quiz ---------------- */
   const handleStartQuiz = (quiz) => {
     console.log("START QUIZ:", quiz);
-    // later → navigate(`/quiz/${quiz._id}`)
+    navigate(`/quiz/${quiz._id}`);
   };
 
   /* ---------------- Render Quiz List ---------------- */
