@@ -17,18 +17,12 @@ const Profile = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      await updateUser(form);
-      toast.success("Profile updated");
-      setIsEditing(false);
-    } catch {
-      toast.error("Failed to update profile");
-    } finally {
-      setSaving(false);
-    }
-  };
+  const handleSave = () => {
+  updateUser(form);
+  toast.success("Profile updated");
+  setIsEditing(false);
+};
+
 
   return (
     <div className="max-w-3xl mx-auto py-12 px-4">
