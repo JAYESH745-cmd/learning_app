@@ -276,32 +276,43 @@ const handleToggleStar = async (cardId) => {
 
       {/* Delete Modal */}
       <Modal
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        title="Confirm Deletion"
-      >
-        <p className="text-sm text-slate-600 mb-6">
-          Are you sure you want to delete this flashcard set?
-          This action cannot be undone.
-        </p>
+  isOpen={isDeleteModalOpen}
+  onClose={() => setIsDeleteModalOpen(false)}
+  title="Delete flashcard set?"
+>
+  <div className="space-y-3">
+    <p className="text-sm text-slate-600">
+      This will permanently delete this flashcard set and all of its cards.
+    </p>
 
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => setIsDeleteModalOpen(false)}
-            className="px-4 py-2 rounded-lg border"
-          >
-            Cancel
-          </button>
+    <p className="text-sm text-red-600 font-medium">
+      This action cannot be undone.
+    </p>
+  </div>
 
-          <button
-            onClick={handleConfirmDelete}
-            disabled={deleting}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white"
-          >
-            {deleting ? "Deleting..." : "Delete"}
-          </button>
-        </div>
-      </Modal>
+  <div className="mt-6 flex justify-end gap-3">
+    <button
+      onClick={() => setIsDeleteModalOpen(false)}
+      className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700
+                 hover:bg-slate-100 transition"
+    >
+      Cancel
+    </button>
+
+    <button
+      onClick={handleConfirmDelete}
+      disabled={deleting}
+      className={`px-4 py-2 rounded-lg text-white transition
+        ${deleting
+          ? "bg-red-400 cursor-not-allowed"
+          : "bg-red-600 hover:bg-red-700"
+        }`}
+    >
+      {deleting ? "Deleting…" : "Delete"}
+    </button>
+  </div>
+</Modal>
+
     </>
   );
 };
