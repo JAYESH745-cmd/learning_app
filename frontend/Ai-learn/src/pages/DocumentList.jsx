@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 
-import documentService from "../services/documentservice.js";
+import documentService from "../services/documentService.js";
 import Spinner from "../components/common/Spinner.jsx";
 import Button from "../components/common/Button.jsx";
 
