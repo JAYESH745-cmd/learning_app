@@ -17,6 +17,12 @@ axiosInstance.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+    if (config.method === "get") {
+      delete config.headers["Content-Type"];
+    } else {
+      // ✅ Only set JSON content-type when body exists
+      config.headers["Content-Type"] = "application/json";
+    }
     return config;
   },
   (error) => {
