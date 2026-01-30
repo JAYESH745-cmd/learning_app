@@ -31,7 +31,7 @@ const Sidebar = ({ isSidebarOpen }) => {
           <BookOpen className="text-white" size={24} />
         </div>
         <span className="text-lg font-semibold text-slate-800">
-          AI Learning Assistant
+          Memora
         </span>
       </div>
 
