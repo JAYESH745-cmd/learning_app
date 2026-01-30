@@ -4,6 +4,14 @@ import { Star } from "lucide-react";
 const Flashcard = ({ flashcard, onToggleStar }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const difficultyColors = {
+  easy: "bg-green-600",
+  medium: "bg-yellow-500",
+  hard: "bg-red-600",
+};
+const difficult =
+  flashcard.difficult?.toLowerCase() || "medium";
+
   return (
     <div style={{ perspective: "1000px" }} className="relative h-56 w-full">
       <div
@@ -39,6 +47,20 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
               }`}
             />
           </button>
+         <span
+  className={`
+    absolute top-4 left-4
+    px-5 py-2
+    rounded-xl
+    text-sm font-bold uppercase
+    tracking-wide
+    text-white
+    shadow-lg
+    ${difficultyColors[difficult] || "bg-slate-700"}
+  `}
+>
+  {difficult}
+</span>
 
           {/* QUESTION */}
           <div className="h-full flex items-center justify-center text-center p-6">
@@ -64,9 +86,20 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
           onClick={() => setIsFlipped(false)}
         >
           {/* DIFFICULTY — NOW VISIBLE */}
-          <span className="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-white border border-emerald-200 text-emerald-700 text-sm capitalize">
-            {flashcard.difficulty}
-          </span>
+          <span
+          className={`
+          absolute top-4 left-4
+          px-5 py-2
+          rounded-xl
+          text-sm font-bold uppercase
+          tracking-wide
+          text-white
+          shadow-lg
+          ${difficultyColors[difficult] || "bg-slate-700"}
+        `}
+      >
+        {difficult}
+      </span>
 
           {/* ANSWER */}
           <div className="h-full flex items-center justify-center text-center p-6">
