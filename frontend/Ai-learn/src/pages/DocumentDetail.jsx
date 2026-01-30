@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import documentService from "../services/documentservice";
-import Spinner from "../components/common/Spinner";
+import documentService from "../services/documentservice.js"
+import Spinner from "../components/common/Spinner.jsx";
 import toast from "react-hot-toast";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import ChatInterface from "../components/chat/ChatInterface";
-import AIActions from "../components/ai/aiActions";
-import FlashcardManager from "../components/flashcards/FlashcardManager";
-import QuizManager from "../components/quizzes/QuizManager";
+import ChatInterface from "../components/chat/ChatInterface.jsx";
+import AIActions from "../components/ai/aiActions.jsx";
+import FlashcardManager from "../components/flashcards/FlashcardManager.jsx";
+import QuizManager from "../components/quizzes/QuizManager.jsx";
 
 const DocumentDetailPage = () => {
   const { id } = useParams();

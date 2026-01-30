@@ -10,9 +10,9 @@ import {
   X,
 } from "lucide-react";
 
-import documentService from "../services/documentService";
-import Spinner from "../components/common/Spinner";
-import Button from "../components/common/Button";
+import documentService from "../services/documentservice.js";
+import Spinner from "../components/common/Spinner.jsx";
+import Button from "../components/common/Button.jsx";
 
 const DocumentListPage = () => {
   const [documents, setDocuments] = useState([]);
