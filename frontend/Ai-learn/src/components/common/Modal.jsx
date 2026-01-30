@@ -5,33 +5,27 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen px-4 py-8">
-        {/* Backdrop */}
-        <div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4">
+      {/* Modal */}
+      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-xl p-6">
+        {/* Close button */}
+        <button
           onClick={onClose}
-        />
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition"
+        >
+          <X className="w-5 h-5" strokeWidth={2} />
+        </button>
 
-        {/* Modal */}
-        <div className="relative w-full max-w-lg bg-white/95 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-xl">
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition"
-          >
-            <X className="w-5 h-5" strokeWidth={2} />
-          </button>
+        {/* Header */}
+        {title && (
+          <h3 className="mb-4 text-lg font-semibold text-slate-900">
+            {title}
+          </h3>
+        )}
 
-          {/* Header */}
-          <div className="mb-6 pr-8">
-            <h3 className="text-xl font-medium text-slate-900 tracking-tight">
-              {title}
-            </h3>
-          </div>
-
-          {/* Content */}
-          <div>{children}</div>
+        {/* Content */}
+        <div className="space-y-4">
+          {children}
         </div>
       </div>
     </div>

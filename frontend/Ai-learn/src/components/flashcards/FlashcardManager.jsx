@@ -279,8 +279,9 @@ const handleToggleStar = async (cardId) => {
   isOpen={isDeleteModalOpen}
   onClose={() => setIsDeleteModalOpen(false)}
   title="Delete flashcard set?"
+  
 >
-  <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+  <div className="space-y-6">
     <p className="text-sm text-slate-600">
       This will permanently delete this flashcard set and all of its cards.
     </p>
