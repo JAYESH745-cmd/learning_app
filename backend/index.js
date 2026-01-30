@@ -42,6 +42,14 @@ app.use("/api/ai",aiRoutes);
 app.use("/api/quiz",quizRoutes);
 app.use("/api/dashboard",progressRoutes);
 
+// backend setup
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend is running 🚀"
+  });
+});
+
 
 //error handler 
 
