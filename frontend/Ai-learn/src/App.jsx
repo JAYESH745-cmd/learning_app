@@ -37,7 +37,7 @@ function App() {
           <Route path="/documents" element={<DocumentList/>}/>
           <Route path="/documents/:id" element={<DocumentDetail/>}/>
           <Route path="/flashcards" element={<FlashcardList/>}/>
-          <Route path="/documents/:id/flashcard" element={<FlashcardPage/>}/>
+          <Route path="/flashcards/:id" element={<FlashcardPage />}/>
           <Route path="/profile" element={<Profile/>}/>
           <Route path="/quiz/:quizId" element={<QuizTake/>}/>
           <Route path="/quiz/:quizId/results" element={<QuizResult/>}/>
