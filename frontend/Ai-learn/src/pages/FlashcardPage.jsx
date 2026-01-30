@@ -1,72 +1,103 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+} from "lucide-react";
 import toast from "react-hot-toast";
+
 import flashcardService from "../services/flashcardservice";
 import Spinner from "../components/common/Spinner";
+import Flashcard from "../components/flashcards/Flashcard";
 
 const FlashcardPage = () => {
-  const { id } = useParams(); // documentId
+  const { id: documentId } = useParams();
+  const navigate = useNavigate();
+
   const [cards, setCards] = useState([]);
-  const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  /* ---------------- Load flashcards ---------------- */
   useEffect(() => {
     const loadFlashcards = async () => {
       try {
-        const res = await flashcardService.getFlashcardsForDocument(id);
-        setCards(res.data); // ✅ ARRAY
+        const res = await flashcardService.getFlashcardsForDocument(documentId);
+        setCards(res.data);
       } catch (err) {
-        toast.error(err.message || "Failed to load flashcards");
+        toast.error("Failed to load flashcards");
       } finally {
         setLoading(false);
       }
     };
 
     loadFlashcards();
-  }, [id]);
+  }, [documentId]);
 
   if (loading) return <Spinner />;
-  if (cards.length === 0) return <p>No flashcards found</p>;
+  if (cards.length === 0) {
+    return <p className="text-center text-slate-500">No flashcards found</p>;
+  }
 
-  const card = cards[index];
+  const card = cards[currentIndex];
+
+  /* ---------------- Handlers ---------------- */
+  const handleNext = () => {
+    setCurrentIndex((i) => (i + 1) % cards.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((i) =>
+      (i - 1 + cards.length) % cards.length
+    );
+  };
+
+  const handleToggleStar = async (cardId) => {
+    try {
+      await flashcardService.toggleStar(cardId);
+      setCards((prev) =>
+        prev.map((c) =>
+          c._id === cardId ? { ...c, starred: !c.starred } : c
+        )
+      );
+    } catch {
+      toast.error("Failed to update star");
+    }
+  };
 
   return (
-    <div className="max-w-xl mx-auto py-12 text-center">
-      <p className="text-sm text-slate-500 mb-2">
-        Card {index + 1} of {cards.length}
-      </p>
-
-      {/* Flashcard */}
-      <div
-        onClick={() => setFlipped(!flipped)}
-        className="cursor-pointer p-8 rounded-2xl border bg-white min-h-[220px] flex items-center justify-center text-lg font-medium"
+    <div className="max-w-2xl mx-auto space-y-6">
+      <button
+        onClick={() => navigate("/flashcards")}
+        className="flex items-center gap-2 text-sm text-slate-600"
       >
-        {flipped ? card.answer : card.question}
-      </div>
+        <ArrowLeft className="w-4 h-4" />
+        Back to flashcards
+      </button>
 
-      {/* Controls */}
-      <div className="mt-6 flex justify-between">
+      <Flashcard
+        flashcard={card}
+        onToggleStar={handleToggleStar}
+      />
+
+      <div className="flex items-center justify-between">
         <button
-          disabled={index === 0}
-          onClick={() => {
-            setIndex((i) => i - 1);
-            setFlipped(false);
-          }}
-          className="px-4 py-2 border rounded-lg disabled:opacity-50"
+          onClick={handlePrev}
+          className="p-3 rounded-lg border hover:bg-slate-50"
         >
-          Previous
+          <ChevronLeft />
         </button>
 
+        <span className="text-sm text-slate-500">
+          {currentIndex + 1} / {cards.length}
+        </span>
+
         <button
-          disabled={index === cards.length - 1}
-          onClick={() => {
-            setIndex((i) => i + 1);
-            setFlipped(false);
-          }}
-          className="px-4 py-2 bg-emerald-500 text-white rounded-lg disabled:opacity-50"
+          onClick={handleNext}
+          className="p-3 rounded-lg border hover:bg-slate-50"
         >
-          Next
+          <ChevronRight />
         </button>
       </div>
     </div>
