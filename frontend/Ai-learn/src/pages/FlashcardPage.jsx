@@ -18,7 +18,7 @@ const FlashcardPage = () => {
   const [set, setSet] = useState(null);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  console.log(setId);
   /* -------- Load ONE flashcard set -------- */
   useEffect(() => {
     const loadSet = async () => {
@@ -26,7 +26,6 @@ const FlashcardPage = () => {
         // backend returns ALL sets → find by id
         const res = await flashcardService.getAllFlashcardSets();
         const found = res.data.find((s) => s.documentId === setId);
-
         if (!found) {
           toast.error("Flashcard set not found");
           navigate("/flashcards");
