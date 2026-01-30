@@ -108,7 +108,6 @@ const DashboardPage = () => {
             <ActivityItem
               key={quiz._id}
               title={`Attempted Quiz: ${quiz.title}`}
-              date={quiz.completedAt || quiz.createdAt}
               rightText={`${quiz.score}%`}
             />
           ))}
