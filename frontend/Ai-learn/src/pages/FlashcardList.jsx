@@ -15,8 +15,9 @@ const FlashcardList = () => {
   const fetchSets = async () => {
     setLoading(true);
     try {
-      const data = await flashcardService.getAllFlashcardSets();
-      setSets(data);
+      const res = await flashcardService.getAllFlashcardSets();
+      setSets(res.data); // <-- array
+
     } catch (err) {
       toast.error(err.message || "Failed to load flashcards");
     } finally {
